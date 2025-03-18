@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -19,6 +20,11 @@ type FeedData struct {
 	Value        string `json:"value" bson:"value"`
 	CreatedAt    string `json:"created_at" bson:"created_at"`
 	TimeDownload string `bson:"time_download"`
+}
+type PushData struct {
+    ID       string `json:"id" bson:"id"`
+    Value    string `json:"value" bson:"value"`
+    CreatedAt string `json:"created_at" bson:"created_at"`
 }
 
 var mongoClient *mongo.Client
@@ -122,6 +128,65 @@ func fetchDataHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(results)
 }
 
+// Push data to Adafruit IO
+func pushData(config util.Config) http.HandlerFunc {
+    return func(w http.ResponseWriter, r *http.Request) {
+        var requestData map[string]string
+        if err := json.NewDecoder(r.Body).Decode(&requestData); err != nil {
+            http.Error(w, "Invalid request body", http.StatusBadRequest)
+            return
+        }
+
+        jsonData, err := json.Marshal(requestData)
+        if err != nil {
+            http.Error(w, "Error encoding JSON", http.StatusInternalServerError)
+            return
+        }
+
+        url := fmt.Sprintf("https://io.adafruit.com/api/v2/%s/feeds/%s/data", config.Username, config.FeedKey)
+
+        req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+        if err != nil {
+            http.Error(w, "Error creating request", http.StatusInternalServerError)
+            return
+        }
+
+        req.Header.Set("Content-Type", "application/json")
+        req.Header.Set("X-AIO-Key", config.AioKey)
+
+        client := &http.Client{}
+        resp, err := client.Do(req)
+        if err != nil {
+            http.Error(w, "Error sending request", http.StatusInternalServerError)
+            return
+        }
+        defer resp.Body.Close()
+
+        // Store pushed data into MongoDB
+        ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+        defer cancel()
+
+        pushDocument := PushData{
+            ID:        "manual_push", // ID giả định
+            Value:     requestData["value"],
+            CreatedAt: time.Now().UTC().Format(time.RFC3339),
+        }
+
+        _, err = mongoCollection.InsertOne(ctx, pushDocument)
+        if err != nil {
+            log.Println("Error storing pushed data into MongoDB:", err)
+        } else {
+            fmt.Println("Pushed data stored in MongoDB!")
+        }
+
+        w.Header().Set("Content-Type", "application/json")
+        json.NewEncoder(w).Encode(map[string]string{
+            "message": "Data pushed successfully",
+            "status":  resp.Status,
+        })
+    }
+}
+
 func main() {
 	connectToMongoDB()
 
@@ -146,6 +211,7 @@ func main() {
 
 	// API endpoint để lấy dữ liệu từ MongoDB
 	http.HandleFunc("/fetch", fetchDataHandler)
+	http.HandleFunc("/push", pushData(config))
 
 	fmt.Println("Server running on port 8080...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
