@@ -1,11 +1,16 @@
 package util
 
-import "github.com/spf13/viper"
+import (
+	"strings"
+
+	"github.com/spf13/viper"
+)
 
 type Config struct {
 	Username string `mapstructure:"USERNAME1"`
 	AioKey   string `mapstructure:"AIOKEY"`
-	FeedKey  string `mapstructure:"FEEDKEY"`
+	FeedKeyGet  [] string `mapstructure:"FEEDKEYGET"`
+	FeedKeyPost [] string `mapstructure:"FEEDKEYPOST"`
 }
 
 func LoadConfig(path string) (config Config, err error) {
@@ -21,5 +26,7 @@ func LoadConfig(path string) (config Config, err error) {
 		return
 	}
 	err = viper.Unmarshal(&config)
+	config.FeedKeyGet = strings.Split(viper.GetString("FEEDKEYGET"), ",")
+    config.FeedKeyPost = strings.Split(viper.GetString("FEEDKEYPOST"), ",")
 	return
 }
