@@ -1,0 +1,15 @@
+Đọc dữ liệu từ:
+1. Cảm biến nhiệt độ độ ẩm
+https://io.adafruit.com/anhcevn/feeds/iot-project
+https://io.adafruit.com/anhcevn/feeds/bbc-hum
+2. Cảm biến ánh sáng
+https://io.adafruit.com/anhcevn/feeds/bbc-ir
+3. Cảm biến hồng ngoại
+https://io.adafruit.com/anhcevn/feeds/pir-sensor
+Gửi dữ liệu lên server cloud đến:
+1. Quạt mini: add data từ 0->100
+https://io.adafruit.com/anhcevn/feeds/fan-level
+2. Đèn: add data 0: tắt, 1: bật
+https://io.adafruit.com/anhcevn/feeds/relay-sensor
+3. Mode: add data 0: điều khiển thủ công, 1: tự động
+https://io.adafruit.com/anhcevn/feeds/automatic-mode
