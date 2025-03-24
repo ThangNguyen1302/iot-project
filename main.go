@@ -131,6 +131,15 @@ func fetchDataHandler(w http.ResponseWriter, r *http.Request) {
 // Push data to Adafruit IO
 func pushData(config util.Config) http.HandlerFunc {
     return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+        w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+        // Handle preflight request
+        if r.Method == http.MethodOptions {
+            w.WriteHeader(http.StatusOK)
+            return
+        }
         var requestData map[string]string
         if err := json.NewDecoder(r.Body).Decode(&requestData); err != nil {
             http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -178,8 +187,6 @@ func pushData(config util.Config) http.HandlerFunc {
         } else {
             fmt.Println("Pushed data stored in MongoDB!")
         }
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Content-Type", "application/json")
         json.NewEncoder(w).Encode(map[string]string{
             "message": "Data pushed successfully",
             "status":  resp.Status,
