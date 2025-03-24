@@ -1,16 +1,45 @@
 import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Slider } from "@miblanchard/react-native-slider";
 import { Feather } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useRouter } from "expo-router";
+import { getData, postData } from "@/services/api";
+// import { useSWR } from "swr";
 
 export default function Thermostat() {
   const [temperature, setTemperature] = useState(22);
   const [isActive, setIsActive] = useState(false);
+  const [data, setData] = useState<{ value: number }[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getData();
+        console.log("get data: ",response);
+        setData(response);
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu:", error);
+      }
+    };
+
+    fetchData();
+
+    const interval = setInterval(() => {
+      fetchData();
+    }, 5000000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handlePress = () => {
     setIsActive(!isActive);
+  };
+
+  const handleTemperatureChange = (value: number) => {
+    const pushDocument = {
+      value: String(value),
+    };
+    console.log("pushDocument: ", pushDocument);
+    postData( pushDocument );
   };
 
   return (
@@ -27,8 +56,8 @@ export default function Thermostat() {
         <View className="w-2/4 h-6 mt-4">
           <Slider
             value={temperature}
-            onValueChange={(value) => setTemperature(Math.round(value[0]))}
-            minimumValue={0}
+            onValueChange={(value) => setTemperature(Math.round(value[0]))} // Cập nhật UI ngay khi trượt
+            onSlidingComplete={(value) => handleTemperatureChange(value[0])} // Gửi API khi thả ra            minimumValue={0}
             maximumValue={100}
             step={1}
             thumbTintColor="#9b59b6"
@@ -65,7 +94,7 @@ export default function Thermostat() {
         <View className="bg-white p-4 rounded-2xl w-36 items-center shadow-md">
           <Feather name="thermometer" size={24} color="orange" />
           <Text className="text-gray-600 mt-2">Outside Temp.</Text>
-          <Text className="text-xl font-semibold">10°</Text>
+          <Text className="text-xl font-semibold">{data[0] ? `${data[0].value}°` : "N/A"}</Text>
         </View>
       </View>
     </View>

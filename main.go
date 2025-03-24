@@ -178,8 +178,8 @@ func pushData(config util.Config) http.HandlerFunc {
         } else {
             fmt.Println("Pushed data stored in MongoDB!")
         }
-
-        w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Content-Type", "application/json")
         json.NewEncoder(w).Encode(map[string]string{
             "message": "Data pushed successfully",
             "status":  resp.Status,
