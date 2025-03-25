@@ -27,4 +27,18 @@ export const postData = async (data: any) => {
   }
 };
 
+export const postAuto = async (data: any) => {
+  try {
+    const response = await axios.post(`http://localhost:8080/auto`, data, {
+      headers: {
+        "Content-Type": "application/json", // Đảm bảo gửi đúng JSON
+      },
+    });    console.log("postAuto: ",response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi khi gọi API:", error);
+    throw error;
+  }
+};
+
 
