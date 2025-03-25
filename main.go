@@ -128,24 +128,20 @@ func fetchDataHandler(w http.ResponseWriter, r *http.Request) {
 
 	collections := []string{"bbc-hum", "pir-sensor", "iot-project", "fan-level"}
 
-	result := make(map[string][]FeedData)
+	result := make(map[string]FeedData)
 	for _, collectionName := range collections {
 		collection := db.Collection(collectionName)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		cursor, err := collection.Find(ctx, map[string]interface{}{})
-		if err != nil {
-			http.Error(w, "Failed to retrieve data", http.StatusInternalServerError)
-			return
-		}
-		defer cursor.Close(ctx)
+		opts := options.FindOne().SetSort(map[string]interface{}{"_id": -1})
 
-		var data []FeedData
-		if err := cursor.All(ctx, &data); err != nil {
-			http.Error(w, "Error decoding MongoDB data", http.StatusInternalServerError)
-			return
+		var data FeedData
+		err := collection.FindOne(ctx, map[string]interface{}{}, opts).Decode(&data)
+		if err != nil {
+			log.Printf("Failed to retrieve data from collection '%s': %v\n", collectionName, err)			
+			continue
 		}
 		result[collectionName] = data
 	}
