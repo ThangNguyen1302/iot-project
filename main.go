@@ -1,10 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"strconv"
+	"strings"
 
 	// "io"
 	"log"
@@ -33,6 +37,64 @@ type PushData struct {
 
 var mongoClient *mongo.Client
 
+func processAndStoreFanTrainData() {
+    // Mở file fanTrain.txt
+    file, err := os.Open("fanTrain.txt")
+    if err != nil {
+        log.Fatal("Error opening file:", err)
+    }
+    defer file.Close()
+
+    // Tạo scanner để đọc từng dòng trong file
+    scanner := bufio.NewScanner(file)
+
+    // Kết nối đến MongoDB
+    db := mongoClient.Database("iot_data")
+    trainDataFanCollection := db.Collection("train-data-fan")
+
+    // Đọc từng dòng và lưu vào collection train-data-fan
+    for scanner.Scan() {
+        line := scanner.Text()
+        // Tách giá trị từ dòng (giả sử các giá trị được phân cách bằng dấu phẩy)
+        values := strings.Split(line, ",")
+        if len(values) != 3 {
+            log.Println("Invalid line format:", line)
+            continue
+        }
+
+        // Chuyển đổi giá trị từ chuỗi sang kiểu dữ liệu phù hợp
+        tmp, err1 := strconv.ParseFloat(strings.TrimSpace(values[0]), 64)
+        hum, err2 := strconv.ParseFloat(strings.TrimSpace(values[1]), 64)
+        fan, err3 := strconv.Atoi(strings.TrimSpace(values[2]))
+        if err1 != nil || err2 != nil || err3 != nil {
+            log.Println("Error parsing line:", line)
+            continue
+        }
+        document := map[string]interface{}{
+            "tmp": tmp,       
+            "hum": hum,       
+            "fan": fan,       
+            "time": time.Now(), 
+        }
+
+        // Tạo context cho MongoDB
+        ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+        defer cancel()
+
+        // Lưu document vào collection train-data-fan
+        _, err := trainDataFanCollection.InsertOne(ctx, document)
+        if err != nil {
+            log.Println("Error inserting into train-data-fan collection:", err)
+        }
+    }
+
+    // Kiểm tra lỗi khi đọc file
+    if err := scanner.Err(); err != nil {
+        log.Fatal("Error reading file:", err)
+    }
+
+    fmt.Println("Data successfully processed and stored in train-data-fan collection!")
+}
 func connectToMongoDB() {
 	var err error
 	mongoClient, err = mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
@@ -47,7 +109,7 @@ func connectToMongoDB() {
 	if err != nil {
 		log.Fatal("Error connecting to MongoDB:", err)
 	}
-
+	processAndStoreFanTrainData()
 	// Tạo các collection tương ứng với danh sách feed keys
 	fmt.Println("Connected to MongoDB!")
 }
@@ -140,7 +202,7 @@ func fetchDataHandler(w http.ResponseWriter, r *http.Request) {
 		var data FeedData
 		err := collection.FindOne(ctx, map[string]interface{}{}, opts).Decode(&data)
 		if err != nil {
-			log.Printf("Failed to retrieve data from collection '%s': %v\n", collectionName, err)			
+			log.Printf("Failed to retrieve data from collection '%s': %v\n", collectionName, err)
 			continue
 		}
 		result[collectionName] = data
