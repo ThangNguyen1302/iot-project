@@ -52,6 +52,7 @@ export default function Thermostat() {
         console.log("fan level data",response);
         setAutoData(response); // Assuming response has a 'success' boolean field
         setFanLevelAPI(parseInt(response.prediction, 10));
+        setFanLevel(parseInt(response.prediction, 10));
 
       }
       catch (error) {
@@ -69,6 +70,7 @@ export default function Thermostat() {
 
   const handlePress = async () => {
     setIsActive(!isActive);
+
   };
 
   const handleFanLevelChange = (value: number) => {

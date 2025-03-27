@@ -109,7 +109,7 @@ func traindata(re *regression.Regression) {
 }
 func processAndStoreFanTrainData() {
 	// Mở file fanTrain.txt
-	file, err := os.Open("fanTrain.txt")
+	file, err := os.Open("fan_speed_data_large.txt")
 	if err != nil {
 		log.Fatal("Error opening file:", err)
 	}
