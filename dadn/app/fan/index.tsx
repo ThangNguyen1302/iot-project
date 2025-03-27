@@ -133,7 +133,7 @@ export default function Thermostat() {
         </View>
         <View className="bg-white p-4 rounded-2xl w-36 items-center shadow-md">
           <Feather name="thermometer" size={24} color="orange" />
-          <Text className="text-gray-600 mt-2">Outside Temp.</Text>
+          <Text className="text-gray-600 mt-2">Inside Temp.</Text>
           <Text className="text-xl font-semibold">{data["iot-project"] ? `${data["iot-project"].value}°` : "N/A"}</Text>
         </View>
       </View>
