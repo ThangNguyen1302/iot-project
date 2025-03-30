@@ -18,7 +18,7 @@ export default function FanLayout() {
         />
         <Text className="text-lg font-semibold">Thermostat</Text>
         <Feather name="settings" size={24} color="gray" />
-      </View>{" "}
+      </View>
       <Slot />
       {/* Bottom Controls */}
       <View className="flex-row justify-around mt-auto">

@@ -14,16 +14,14 @@ export default function Home() {
       <View className="bg-purple-500 p-4 rounded-2xl mb-6">
         <Text className="text-white font-semibold mb-2">Energy Usage</Text>
         <View className="flex-row justify-between">
-          <Text className="text-white">
-            Today
-            {"\n"}
-            <Text className="text-2xl font-bold">30.7 kWh</Text>
-          </Text>
-          <Text className="text-white">
-            This month
-            {"\n"}
-            <Text className="text-2xl font-bold">235.37 kWh</Text>
-          </Text>
+          <View >
+          <Text className="text-white">Today</Text>
+          <Text className="text-white text-2xl font-bold">30.7 kWh</Text>
+          </View>
+          <View >
+          <Text className="text-white">This month</Text>
+          <Text className=" text-white text-2xl font-bold">235.37 kWh</Text>
+          </View>
         </View>
       </View>
 
