@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, Image, ScrollView, AppState, AppStateStatus } from "react-native";
 import { useState, useEffect } from "react";
 import { Slider } from "@miblanchard/react-native-slider";
 import { Feather } from "@expo/vector-icons";
@@ -47,6 +47,8 @@ export default function Thermostat() {
         const response = await getData();
         console.log("get data: ",response);
         setData(response);
+        const fanLevel = await AsyncStorage.getItem("fanLevel");
+        console.log("fanLevel storage: ",fanLevel);
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu:", error);
       }
@@ -90,6 +92,31 @@ export default function Thermostat() {
       return () => clearInterval(interval);
     }
   }, [isActive]);
+
+  useEffect(() => {
+    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
+      if (nextAppState === "inactive" || nextAppState === "background") {
+        console.log("App is closing, clearing AsyncStorage...");
+        
+        // Kiểm tra xem đã lưu chưa, tránh gọi hàm removeItem không cần thiết
+        const savedLevel = await AsyncStorage.getItem("fanLevel");
+        const saveMode = await AsyncStorage.getItem("isActive");
+        
+        if (savedLevel || saveMode) {
+          await AsyncStorage.removeItem("fanLevel");
+          await AsyncStorage.removeItem("isActive");
+          console.log("AsyncStorage cleared");
+        }
+      }
+    };
+  
+    const subscription = AppState.addEventListener("change", handleAppStateChange);
+  
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+  
 
   const handlePress = async () => {
     const newState = !isActive;
