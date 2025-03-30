@@ -1,4 +1,12 @@
-import { View, Text, TouchableOpacity, Image, ScrollView, AppState, AppStateStatus } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  AppState,
+  AppStateStatus,
+} from "react-native";
 import { useState, useEffect } from "react";
 import { Slider } from "@miblanchard/react-native-slider";
 import { Feather } from "@expo/vector-icons";
@@ -16,7 +24,7 @@ export default function Thermostat() {
     value: string; // Dữ liệu từ API trả về là string, không phải number
   }
   const [data, setData] = useState<{ [key: string]: SensorData }>({});
-    interface AutoData {
+  interface AutoData {
     hum: number;
     temperature: number;
     prediction: string;
@@ -45,10 +53,13 @@ export default function Thermostat() {
     const fetchData = async () => {
       try {
         const response = await getData();
-        console.log("get data: ",response);
-        setData(response);
+        console.log("get data: ", response);
+        // Chỉ cập nhật nếu dữ liệu mới khác với dữ liệu hiện tại
+        if (JSON.stringify(response) !== JSON.stringify(data)) {
+          setData(response);
+        }
         const fanLevel = await AsyncStorage.getItem("fanLevel");
-        console.log("fanLevel storage: ",fanLevel);
+        console.log("fanLevel storage: ", fanLevel);
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu:", error);
       }
@@ -66,21 +77,22 @@ export default function Thermostat() {
     const fetchData = async () => {
       try {
         const response = await postAuto({ feed: `${isActive ? "ON" : "OFF"}` });
-        console.log("fan level data",response);
+        console.log("fan level data", response);
         setAutoData(response); // Assuming response has a 'success' boolean field
-        setFanLevelAPI(parseInt(response.prediction, 10));
-        const fanLevelValue = parseInt(response.prediction, 10);
-        setFanLevel(fanLevelValue);
-        await AsyncStorage.setItem("fanLevel", fanLevelValue.toString());
-        const pushDocument = {
-          value: String(fanLevelValue),
-          feed: "fan-level",
-        };
-        console.log("pushDocument: ", pushDocument);
-        await postData( pushDocument );
 
-      }
-      catch (error) {
+        const fanLevelValue = parseInt(response.prediction, 10);
+        if (fanLevel !== fanLevelValue) {
+          setFanLevelAPI(parseInt(response.prediction, 10));
+          setFanLevel(fanLevelValue);
+          await AsyncStorage.setItem("fanLevel", fanLevelValue.toString());
+          const pushDocument = {
+            value: String(fanLevelValue),
+            feed: "fan-level",
+          };
+          console.log("pushDocument: ", pushDocument);
+          await postData(pushDocument);
+        }
+      } catch (error) {
         console.error("Lỗi khi gọi API:", error);
       }
     };
@@ -97,11 +109,11 @@ export default function Thermostat() {
     const handleAppStateChange = async (nextAppState: AppStateStatus) => {
       if (nextAppState === "inactive" || nextAppState === "background") {
         console.log("App is closing, clearing AsyncStorage...");
-        
+
         // Kiểm tra xem đã lưu chưa, tránh gọi hàm removeItem không cần thiết
         const savedLevel = await AsyncStorage.getItem("fanLevel");
         const saveMode = await AsyncStorage.getItem("isActive");
-        
+
         if (savedLevel || saveMode) {
           await AsyncStorage.removeItem("fanLevel");
           await AsyncStorage.removeItem("isActive");
@@ -109,14 +121,16 @@ export default function Thermostat() {
         }
       }
     };
-  
-    const subscription = AppState.addEventListener("change", handleAppStateChange);
-  
+
+    const subscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange
+    );
+
     return () => {
       subscription.remove();
     };
   }, []);
-  
 
   const handlePress = async () => {
     const newState = !isActive;
@@ -134,7 +148,7 @@ export default function Thermostat() {
       feed: "fan-level",
     };
     console.log("pushDocument: ", pushDocument);
-    await postData( pushDocument );
+    await postData(pushDocument);
   };
 
   return (
@@ -143,9 +157,7 @@ export default function Thermostat() {
       <View className="items-center mb-6">
         <View className="w-52 h-52 rounded-full border-8 border-gray-200 justify-center items-center bg-white">
           <Text className="text-lg text-gray-500">POWER</Text>
-          <Text className="text-6xl font-bold text-gray-800">
-            {fanLevel}
-          </Text>
+          <Text className="text-6xl font-bold text-gray-800">{fanLevel}</Text>
           <MaterialCommunityIcons name="fan" size={24} color="#87CEEB" />
         </View>
         <View className="w-2/4 h-6 mt-4">
@@ -155,8 +167,8 @@ export default function Thermostat() {
             onSlidingComplete={(value) => handleFanLevelChange(value[0])} // Gửi API khi thả ra            minimumValue={0}
             maximumValue={100}
             step={1}
-            thumbTintColor={isActive ? "#d3d3d3" : "#9b59b6"} // Làm mờ màu khi bị vô hiệu            
-            minimumTrackTintColor={isActive ? "#d3d3d3" : "#9b59b6"} 
+            thumbTintColor={isActive ? "#d3d3d3" : "#9b59b6"} // Làm mờ màu khi bị vô hiệu
+            minimumTrackTintColor={isActive ? "#d3d3d3" : "#9b59b6"}
             trackStyle={{ height: 6 }} // Tăng độ dày của thanh trượt
             thumbStyle={{ width: 18, height: 18 }} // Tăng kích thước nút trượt
             disabled={isActive} // Vô hiệu hóa khi Auto Mode bật
@@ -185,12 +197,16 @@ export default function Thermostat() {
         <View className="bg-white p-4 rounded-2xl w-36 items-center shadow-md">
           <Feather name="droplet" size={24} color="pink" />
           <Text className="text-gray-600 mt-2">Inside humidity</Text>
-          <Text className="text-xl font-semibold">{data["bbc-hum"] ? `${data["bbc-hum"].value}°` : "N/A"}</Text>
+          <Text className="text-xl font-semibold">
+            {data["bbc-hum"] ? `${data["bbc-hum"].value}°` : "N/A"}
+          </Text>
         </View>
         <View className="bg-white p-4 rounded-2xl w-36 items-center shadow-md">
           <Feather name="thermometer" size={24} color="orange" />
           <Text className="text-gray-600 mt-2">Inside Temp.</Text>
-          <Text className="text-xl font-semibold">{data["iot-project"] ? `${data["iot-project"].value}°` : "N/A"}</Text>
+          <Text className="text-xl font-semibold">
+            {data["iot-project"] ? `${data["iot-project"].value}°` : "N/A"}
+          </Text>
         </View>
       </View>
     </View>
