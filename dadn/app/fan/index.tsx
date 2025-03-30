@@ -41,7 +41,7 @@ export default function Thermostat() {
 
     const interval = setInterval(() => {
       fetchData();
-    }, 5000);
+    }, 50000);
     return () => clearInterval(interval);
   }, []);
 
@@ -76,6 +76,7 @@ export default function Thermostat() {
   const handleFanLevelChange = (value: number) => {
     const pushDocument = {
       value: String(value),
+      feed: "fan-level",
     };
     console.log("pushDocument: ", pushDocument);
     postData( pushDocument );

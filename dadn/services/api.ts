@@ -29,7 +29,7 @@ export const postData = async (data: any) => {
 
 export const postAuto = async (data: any) => {
   try {
-    const response = await axios.post(`http://10.0.2.2:8080/auto`, data, {
+    const response = await axios.post(`http://localhost:8080/auto`, data, {
       headers: {
         "Content-Type": "application/json", // Đảm bảo gửi đúng JSON
       },
