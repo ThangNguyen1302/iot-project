@@ -4,7 +4,7 @@ import { Slider } from "@miblanchard/react-native-slider";
 import { Feather } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { getData, postData, postAuto } from "@/services/api";
-// import { useSWR } from "swr";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Thermostat() {
   const [temperature, setTemperature] = useState(22);
@@ -25,6 +25,21 @@ export default function Thermostat() {
   const [autoData, setAutoData] = useState<AutoData | null>(null);
   const [fanLevel, setFanLevel] = useState(0);
   const [fanLevelAPI, setFanLevelAPI] = useState(0);
+
+  // Lấy dữ liệu khi mở lại ứng dụng
+  useEffect(() => {
+    const loadFanLevel = async () => {
+      const savedLevel = await AsyncStorage.getItem("fanLevel");
+      if (savedLevel) {
+        setFanLevel(parseInt(savedLevel, 10));
+      }
+      const saveMode = await AsyncStorage.getItem("isActive");
+      if (saveMode) {
+        setIsActive(saveMode === "true");
+      }
+    };
+    loadFanLevel();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,7 +67,9 @@ export default function Thermostat() {
         console.log("fan level data",response);
         setAutoData(response); // Assuming response has a 'success' boolean field
         setFanLevelAPI(parseInt(response.prediction, 10));
-        setFanLevel(parseInt(response.prediction, 10));
+        const fanLevelValue = parseInt(response.prediction, 10);
+        setFanLevel(fanLevelValue);
+        await AsyncStorage.setItem("fanLevel", fanLevelValue.toString());
 
       }
       catch (error) {
@@ -69,17 +86,23 @@ export default function Thermostat() {
   }, [isActive]);
 
   const handlePress = async () => {
-    setIsActive(!isActive);
-
+    const newState = !isActive;
+    setIsActive(newState);
+    await AsyncStorage.setItem("isActive", newState.toString());
   };
 
-  const handleFanLevelChange = (value: number) => {
+  const handleFanLevelChange = async (value: number) => {
+    const newValue = Math.round(value);
+    setFanLevel(newValue);
+    await AsyncStorage.setItem("fanLevel", newValue.toString());
+
     const pushDocument = {
       value: String(value),
       feed: "fan-level",
+      feed: "fan-level",
     };
     console.log("pushDocument: ", pushDocument);
-    postData( pushDocument );
+    await postData( pushDocument );
   };
 
   return (
@@ -89,7 +112,7 @@ export default function Thermostat() {
         <View className="w-52 h-52 rounded-full border-8 border-gray-200 justify-center items-center bg-white">
           <Text className="text-lg text-gray-500">POWER</Text>
           <Text className="text-6xl font-bold text-gray-800">
-            {isActive&&fanLevelAPI ? fanLevelAPI : fanLevel}
+            {fanLevel}
           </Text>
           <MaterialCommunityIcons name="fan" size={24} color="#87CEEB" />
         </View>

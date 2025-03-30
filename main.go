@@ -277,7 +277,7 @@ func fetchDataHandler(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		opts := options.FindOne().SetSort(map[string]interface{}{"_id": -1})
+		opts := options.FindOne().SetSort(map[string]interface{}{"_id": 1})
 
 		var data FeedData
 		err := collection.FindOne(ctx, map[string]interface{}{}, opts).Decode(&data)
@@ -432,7 +432,7 @@ func AutoData(config util.Config, re *regression.Regression) http.HandlerFunc {
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
 
-			opts := options.FindOne().SetSort(map[string]interface{}{"_id": -1})
+			opts := options.FindOne().SetSort(map[string]interface{}{"_id": 1})
 
 			var data FeedData
 			err := collection.FindOne(ctx, map[string]interface{}{}, opts).Decode(&data)
