@@ -26,6 +26,15 @@ type FeedData struct {
 	CreatedAt    string `json:"created_at" bson:"created_at"`
 	TimeDownload string `bson:"time_download"`
 }
+type PushData struct {
+	ID        string `bson:"id"`
+	Value     string `json:"value" bson:"value"`
+	CreatedAt string `bson:"created_at"`
+	Feed      string `json:"feed" bson:"feed"`
+}
+type Auto struct {
+	Feed      string `json:"feed" bson:"feed"`
+}
 func processAndStoreFanTrainData() {
 	// Mở file fanTrain.txt
 	file, err := os.Open("fan_speed_data_large.txt")
