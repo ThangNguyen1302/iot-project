@@ -70,6 +70,12 @@ export default function Thermostat() {
         const fanLevelValue = parseInt(response.prediction, 10);
         setFanLevel(fanLevelValue);
         await AsyncStorage.setItem("fanLevel", fanLevelValue.toString());
+        const pushDocument = {
+          value: String(fanLevelValue),
+          feed: "fan-level",
+        };
+        console.log("pushDocument: ", pushDocument);
+        await postData( pushDocument );
 
       }
       catch (error) {
@@ -98,7 +104,6 @@ export default function Thermostat() {
 
     const pushDocument = {
       value: String(value),
-      feed: "fan-level",
       feed: "fan-level",
     };
     console.log("pushDocument: ", pushDocument);
