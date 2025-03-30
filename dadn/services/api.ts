@@ -4,7 +4,7 @@ import axios from "axios";
 // Hàm lấy thông tin user
 export const getData = async () => {
   try {
-    const response = await axios.get(`http://10.0.2.2:8080/fetch`);
+    const response = await axios.get(`http://localhost:8080/fetch`);
     console.log(response.data);
     return response.data;
   } catch (error) {
@@ -15,7 +15,7 @@ export const getData = async () => {
 
 export const postData = async (data: any) => {
   try {
-    const response = await axios.post(`http://10.0.2.2:8080/push`, data, {
+    const response = await axios.post(`http://localhost:8080/push`, data, {
       headers: {
         "Content-Type": "application/json", // Đảm bảo gửi đúng JSON
       },

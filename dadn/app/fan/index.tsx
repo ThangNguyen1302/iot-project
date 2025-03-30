@@ -41,7 +41,7 @@ export default function Thermostat() {
 
     const interval = setInterval(() => {
       fetchData();
-    }, 5000000);
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
