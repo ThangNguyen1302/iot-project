@@ -9,7 +9,7 @@ export default function FanLayout() {
   return (
     <View className="flex-1 bg-gray-100 p-4">
       {/* Header */}
-      <View className="flex-row justify-between items-center mb-6">
+      <View className="flex-row justify-between items-center mb-6 mt-6">
         <Feather
           name="chevron-left"
           size={24}

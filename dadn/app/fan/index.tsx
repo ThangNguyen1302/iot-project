@@ -42,7 +42,8 @@ export default function Thermostat() {
         setFanLevel(parseInt(savedLevel, 10));
       }
       const saveMode = await AsyncStorage.getItem("isActive");
-      if (saveMode) {
+      if (saveMode !== null) {
+        console.log("saveMode: ", saveMode);
         setIsActive(saveMode === "true");
       }
     };
@@ -69,7 +70,7 @@ export default function Thermostat() {
 
     const interval = setInterval(() => {
       fetchData();
-    }, 5000);
+    }, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -100,7 +101,7 @@ export default function Thermostat() {
     if (isActive) {
       const interval = setInterval(() => {
         fetchData();
-      }, 5000);
+      }, 10000);
       return () => clearInterval(interval);
     }
   }, [isActive]);
