@@ -3,27 +3,35 @@ import { useState } from "react";
 import { Feather } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRouter } from "expo-router";
+import { useNotification } from "@/contexts/NotificationContext";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("Kitchen");
   const router = useRouter();
+  const { notification } = useNotification(); // Sử dụng Context API
 
   return (
     <View className="flex-1 p-4">
+      {/* {notification && (
+        <View className="bg-red-500 p-4 rounded-2xl mb-4">
+          <Text className="text-white font-semibold mb-2">Notification</Text>
+          <Text className="text-white">
+            Có sự cố xảy ra! Nhấn để xem chi tiết.
+          </Text>
+        </View>
+      )} */}
       {/* Energy Usage Card */}
       <View className="bg-purple-500 p-4 rounded-2xl mb-6">
         <Text className="text-white font-semibold mb-2">Energy Usage</Text>
         <View className="flex-row justify-between">
-          <Text className="text-white">
-            Today
-            {"\n"}
-            <Text className="text-2xl font-bold">30.7 kWh</Text>
-          </Text>
-          <Text className="text-white">
-            This month
-            {"\n"}
-            <Text className="text-2xl font-bold">235.37 kWh</Text>
-          </Text>
+          <View>
+          <Text className="text-white">Today</Text>
+          <Text className="text-white text-2xl font-bold">30.7 kWh</Text>
+          </View>
+          <View>
+          <Text className="text-white">This month</Text>
+          <Text className=" text-white text-2xl font-bold">235.37 kWh</Text>
+          </View>
         </View>
       </View>
 
