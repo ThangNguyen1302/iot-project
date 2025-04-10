@@ -13,26 +13,12 @@ import { Feather } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { getData, postData, postAuto } from "@/services/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSelector, useDispatch } from "react-redux";
 
 export default function Thermostat() {
-  const [temperature, setTemperature] = useState(22);
   const [isActive, setIsActive] = useState(false);
-  interface SensorData {
-    TimeDownload: string;
-    created_at: string;
-    id: string;
-    value: string; // Dữ liệu từ API trả về là string, không phải number
-  }
-  const [data, setData] = useState<{ [key: string]: SensorData }>({});
-  interface AutoData {
-    hum: number;
-    temperature: number;
-    prediction: string;
-  }
-
-  const [autoData, setAutoData] = useState<AutoData | null>(null);
   const [fanLevel, setFanLevel] = useState(0);
-  const [fanLevelAPI, setFanLevelAPI] = useState(0);
+  const data = useSelector((state: any) => state.sensor.data);
 
   // Lấy dữ liệu khi mở lại ứng dụng
   useEffect(() => {
@@ -50,61 +36,37 @@ export default function Thermostat() {
     loadFanLevel();
   }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await getData();
-        console.log("get data: ", response);
-        // Chỉ cập nhật nếu dữ liệu mới khác với dữ liệu hiện tại
-        if (JSON.stringify(response) !== JSON.stringify(data)) {
-          setData(response);
-        }
-        const fanLevel = await AsyncStorage.getItem("fanLevel");
-        console.log("fanLevel storage: ", fanLevel);
-      } catch (error) {
-        console.error("Lỗi khi lấy dữ liệu:", error);
-      }
-    };
-
-    fetchData();
-
-    const interval = setInterval(() => {
-      fetchData();
-    }, 10000);
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await postAuto({ feed: `${isActive ? "ON" : "OFF"}` });
-        console.log("fan level data", response);
-        setAutoData(response); // Assuming response has a 'success' boolean field
-
-        const fanLevelValue = parseInt(response.prediction, 10);
-        if (fanLevel !== fanLevelValue) {
-          setFanLevelAPI(parseInt(response.prediction, 10));
-          setFanLevel(fanLevelValue);
-          await AsyncStorage.setItem("fanLevel", fanLevelValue.toString());
-          const pushDocument = {
-            value: String(fanLevelValue),
-            feed: "fan-level",
-          };
-          console.log("pushDocument: ", pushDocument);
-          await postData(pushDocument);
-        }
-      } catch (error) {
-        console.error("Lỗi khi gọi API:", error);
+  const fetchAutoData = async () => {
+    try {
+      const response = await postAuto({ feed: `${isActive ? "ON" : "OFF"}` });
+      console.log("fan level data", response);
+      const fanLevelValue = parseInt(response.prediction, 10);
+      if (fanLevel !== fanLevelValue) {
+        // setFanLevelAPI(parseInt(response.prediction, 10));
+        setFanLevel(fanLevelValue);
+        await AsyncStorage.setItem("fanLevel", fanLevelValue.toString());
+        const pushDocument = {
+          value: String(fanLevelValue),
+          feed: "fan-level",
+        };
+        console.log("pushDocument: ", pushDocument);
+        await postData(pushDocument);
       }
-    };
-
-    if (isActive) {
-      const interval = setInterval(() => {
-        fetchData();
-      }, 10000);
-      return () => clearInterval(interval);
+    } catch (error) {
+      console.error("Lỗi khi gọi API:", error);
     }
-  }, [isActive]);
+  };
+  if (isActive){
+    console.log("data: ", data);
+    const interval = setInterval(() => {
+      fetchAutoData();
+    }, 10000); // Gọi API mỗi 10 giây
+    return () => clearInterval(interval); // Dọn dẹp interval khi component unmount
+  }
+
+}, [isActive]); // Chỉ gọi khi isActive thay đổi
 
   useEffect(() => {
     const handleAppStateChange = async (nextAppState: AppStateStatus) => {
@@ -137,11 +99,12 @@ export default function Thermostat() {
     const newState = !isActive;
     setIsActive(newState);
     await AsyncStorage.setItem("isActive", newState.toString());
+    
   };
 
   const handleFanLevelChange = async (value: number) => {
     const newValue = Math.round(value);
-    setFanLevel(newValue);
+    // setFanLevel(newValue);
     await AsyncStorage.setItem("fanLevel", newValue.toString());
 
     const pushDocument = {
@@ -165,7 +128,8 @@ export default function Thermostat() {
           <Slider
             value={fanLevel}
             onValueChange={(value) => setFanLevel(Math.round(value[0]))} // Cập nhật UI ngay khi trượt
-            onSlidingComplete={(value) => handleFanLevelChange(value[0])} // Gửi API khi thả ra            minimumValue={0}
+            onSlidingComplete={(value) => handleFanLevelChange(value[0])} // Gửi API khi thả ra            
+            minimumValue={0}
             maximumValue={100}
             step={1}
             thumbTintColor={isActive ? "#d3d3d3" : "#9b59b6"} // Làm mờ màu khi bị vô hiệu
@@ -199,14 +163,14 @@ export default function Thermostat() {
           <Feather name="droplet" size={24} color="pink" />
           <Text className="text-gray-600 mt-2">Inside humidity</Text>
           <Text className="text-xl font-semibold">
-            {data["bbc-hum"] ? `${data["bbc-hum"].value}°` : "N/A"}
+            {data?.["bbc-hum"] ? `${data["bbc-hum"].value}°` : "N/A"}
           </Text>
         </View>
         <View className="bg-white p-4 rounded-2xl w-36 items-center shadow-md">
           <Feather name="thermometer" size={24} color="orange" />
           <Text className="text-gray-600 mt-2">Inside Temp.</Text>
           <Text className="text-xl font-semibold">
-            {data["iot-project"] ? `${data["iot-project"].value}°` : "N/A"}
+            {data?.["iot-project"] ? `${data["iot-project"].value}°` : "N/A"}
           </Text>
         </View>
       </View>

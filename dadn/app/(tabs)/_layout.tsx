@@ -2,12 +2,16 @@ import { Slot } from "expo-router";
 import { View, TouchableOpacity, Text, Image } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useRouter, usePathname } from "expo-router";
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "../../redux/store"; // Import AppDispatch type
+import { fetchSensorData } from "../../redux/slices/sensorSlice"; // Import Redux action
 export default function FanLayout() {
   const router = useRouter();
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState("Favourites");
+  const dispatch = useDispatch<AppDispatch>();
+
   const renderTab = (tab: string) => (
     <TouchableOpacity
       key={tab}
@@ -19,8 +23,16 @@ export default function FanLayout() {
       <Text className={`${activeTab === tab ? "text-black" : "text-gray-500"}`}>
         {tab}
       </Text>
-    </TouchableOpacity>
-  );
+    </TouchableOpacity>)
+
+  useEffect(() => {
+    // Gọi API mỗi 5 giây
+    const interval = setInterval(() => {
+      dispatch(fetchSensorData());
+    }, 10000);
+
+    return () => clearInterval(interval); // cleanup khi unmount
+  }, []);
   return (
     <View className="flex-1 bg-gray-100 p-4">
       {/* Header */}
