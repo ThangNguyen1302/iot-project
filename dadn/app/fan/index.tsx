@@ -61,12 +61,14 @@ export default function Thermostat() {
   if (isActive){
     console.log("data: ", data);
     const interval = setInterval(() => {
+
       fetchAutoData();
     }, 10000); // Gọi API mỗi 10 giây
     return () => clearInterval(interval); // Dọn dẹp interval khi component unmount
   }
 
 }, [isActive]); // Chỉ gọi khi isActive thay đổi
+
 
   useEffect(() => {
     const handleAppStateChange = async (nextAppState: AppStateStatus) => {
