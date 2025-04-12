@@ -12,7 +12,11 @@ const NotificationContext = createContext<NotificationContextProps | undefined>(
   undefined
 );
 
-export const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
+export const NotificationProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [notification, setNotification] = useState(false);
   const router = useRouter();
   const data = useSelector((state: any) => state.sensor.data);
@@ -29,6 +33,10 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
           type: "warning",
           icon: "warning",
           duration: 5000,
+          style: {
+            paddingVertical: 30, // tăng padding để làm notify cao hơn
+            minHeight: 80, // đảm bảo có chiều cao tối thiểu
+          },
           onPress: () => router.push("../notifications"),
         });
         saveNotification("Có vật thể di chuyển");
@@ -54,7 +62,10 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
         notifications = notifications.slice(0, MAX_NOTIFICATIONS);
       }
 
-      await AsyncStorage.setItem("notifications", JSON.stringify(notifications));
+      await AsyncStorage.setItem(
+        "notifications",
+        JSON.stringify(notifications)
+      );
     } catch (error) {
       console.error("Lỗi khi lưu thông báo:", error);
     }
@@ -70,7 +81,9 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
 export const useNotification = () => {
   const context = useContext(NotificationContext);
   if (!context) {
-    throw new Error("useNotification phải được dùng trong NotificationProvider");
+    throw new Error(
+      "useNotification phải được dùng trong NotificationProvider"
+    );
   }
   return context;
 };

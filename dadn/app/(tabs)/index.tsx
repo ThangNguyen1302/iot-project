@@ -25,12 +25,12 @@ export default function Home() {
         <Text className="text-white font-semibold mb-2">Energy Usage</Text>
         <View className="flex-row justify-between">
           <View>
-          <Text className="text-white">Today</Text>
-          <Text className="text-white text-2xl font-bold">30.7 kWh</Text>
+            <Text className="text-white">Today</Text>
+            <Text className="text-white text-2xl font-bold">30.7 kWh</Text>
           </View>
           <View>
-          <Text className="text-white">This month</Text>
-          <Text className=" text-white text-2xl font-bold">235.37 kWh</Text>
+            <Text className="text-white">This month</Text>
+            <Text className=" text-white text-2xl font-bold">235.37 kWh</Text>
           </View>
         </View>
       </View>

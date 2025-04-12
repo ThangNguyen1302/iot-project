@@ -22,7 +22,7 @@ export default function LightControl() {
           <Feather name="sun" size={72} color={isLightOn ? "white" : "gray"} />
         </TouchableOpacity>
         <Text className="text-lg mt-4 text-gray-600">
-        Light is {isLightOn ? "ON" : "OFF"}
+          Light is {isLightOn ? "ON" : "OFF"}
         </Text>
       </View>
     </View>
