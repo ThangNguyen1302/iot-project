@@ -3,13 +3,14 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "update-ip": "ts-node update-env-ip.ts",
+    "start": "npm run update-ip && expo start"
   },
   "jest": {
     "preset": "jest-expo"
@@ -28,6 +29,7 @@
     "expo-font": "~13.0.3",
     "expo-haptics": "~14.0.1",
     "expo-linking": "~7.0.5",
+    "expo-network": "^7.0.5",
     "expo-router": "~4.0.17",
     "expo-splash-screen": "~0.29.22",
     "expo-status-bar": "~2.0.1",
@@ -46,13 +48,8 @@
     "react-native-screens": "~4.4.0",
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
-<<<<<<< HEAD
-    "tailwindcss": "^3.4.17",
-    "expo-network": "~7.0.5"
-=======
     "react-redux": "^9.2.0",
     "tailwindcss": "^3.4.17"
->>>>>>> ab2b42777cf1f117f4425e52f1c5b4d5ba39ebae
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -62,6 +59,7 @@
     "jest": "^29.2.1",
     "jest-expo": "~52.0.4",
     "react-test-renderer": "18.3.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },
   "private": true
