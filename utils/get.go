@@ -25,7 +25,7 @@ func FetchDataHandler(w http.ResponseWriter, r *http.Request) {
 	for _, collectionName := range collections {
 		collection := db.Collection(collectionName)
 
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
 		opts := options.FindOne().SetSort(map[string]interface{}{"_id": 1})

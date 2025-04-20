@@ -28,8 +28,7 @@ export default function Thermostat() {
         setFanLevel(parseInt(savedLevel, 10));
       }
       const saveMode = await AsyncStorage.getItem("isActive");
-      if (saveMode !== null) {
-        console.log("saveMode: ", saveMode);
+      if (saveMode) {
         setIsActive(saveMode === "true");
       }
     };
@@ -101,7 +100,7 @@ export default function Thermostat() {
 
   const handleFanLevelChange = async (value: number) => {
     const newValue = Math.round(value);
-    // setFanLevel(newValue);
+    setFanLevel(newValue);
     await AsyncStorage.setItem("fanLevel", newValue.toString());
 
     const pushDocument = {

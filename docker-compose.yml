@@ -1,0 +1,22 @@
+version: '3'
+services:
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+  
+  iot-backend:
+    build: .
+    image: hungdeptry111/iot-backend:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017
+      - IN_DOCKER=true
+
+volumes:
+  mongo-data:
