@@ -4,11 +4,13 @@ import { Feather } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRouter } from "expo-router";
 import { useNotification } from "@/contexts/NotificationContext";
+import { useSelector } from "react-redux";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("Kitchen");
   const router = useRouter();
   const { notification } = useNotification(); // Sử dụng Context API
+  const data = useSelector((state: any) => state.sensor.data);
 
   return (
     <View className="flex-1 p-4">
@@ -53,10 +55,10 @@ export default function Home() {
         <View className="flex-row items-center mt-2">
           <Feather name="droplet" size={18} color="pink" />
           <Text className="text-xl font-semibold ml-2 mr-4 text-gray-700">
-            49%
+          {data?.["bbc-hum"] ? `${data["bbc-hum"].value}°` : "N/A"}
           </Text>
           <Feather name="thermometer" size={18} color="orange" />
-          <Text className="text-xl font-semibold ml-2 text-gray-700">29°</Text>
+          <Text className="text-xl font-semibold ml-2 text-gray-700">{data?.["iot-project"] ? `${data["iot-project"].value}°` : "N/A"}</Text>
         </View>
       </TouchableOpacity>
 
@@ -74,10 +76,10 @@ export default function Home() {
         <View className="flex-row items-center mt-2">
           <Feather name="droplet" size={18} color="pink" />
           <Text className="text-xl font-semibold ml-2 mr-4 text-gray-700">
-            49%
+          {data?.["bbc-hum"] ? `${data["bbc-hum"].value}°` : "N/A"}
           </Text>
           <Feather name="thermometer" size={18} color="orange" />
-          <Text className="text-xl font-semibold ml-2 text-gray-700">29°</Text>
+          <Text className="text-xl font-semibold ml-2 text-gray-700">{data?.["iot-project"] ? `${data["iot-project"].value}°` : "N/A"}</Text>
         </View>
       </TouchableOpacity>
     </View>
