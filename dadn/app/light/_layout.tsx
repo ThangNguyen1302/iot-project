@@ -16,7 +16,9 @@ export default function FanLayout() {
           color="gray"
           onPress={() => router.push("../")}
         />
-        <Text className="text-lg font-semibold">Light Control</Text>
+        <Text className="text-lg font-semibold">
+          Light Control
+        </Text>
         <Feather name="settings" size={24} color="gray" />
       </View>
       <Slot />
@@ -24,19 +26,27 @@ export default function FanLayout() {
       <View className="flex-row justify-around mt-auto">
         <TouchableOpacity className="items-center">
           <Feather name="zap" size={24} color="purple" />
-          <Text className="text-gray-600">MODE</Text>
+          <Text className="text-gray-600">
+            MODE
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity className="items-center">
           <Feather name="sun" size={24} color="gray" />
-          <Text className="text-gray-600">ECO</Text>
+          <Text className="text-gray-600">
+            ECO
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity className="items-center">
           <Feather name="calendar" size={24} color="gray" />
-          <Text className="text-gray-600">SCHEDULE</Text>
+          <Text className="text-gray-600">
+            SCHEDULE
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity className="items-center">
           <Feather name="clock" size={24} color="gray" />
-          <Text className="text-gray-600">HISTORY</Text>
+          <Text className="text-gray-600">
+            HISTORY
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

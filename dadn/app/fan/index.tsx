@@ -36,39 +36,35 @@ export default function Thermostat() {
     loadFanLevel();
   }, []);
 
-
   useEffect(() => {
-  const fetchAutoData = async () => {
-    try {
-      const response = await postAuto({ feed: `${isActive ? "ON" : "OFF"}` });
-      console.log("fan level data", response);
-      const fanLevelValue = parseInt(response.prediction, 10);
-      if (fanLevel !== fanLevelValue) {
-        // setFanLevelAPI(parseInt(response.prediction, 10));
-        setFanLevel(fanLevelValue);
-        await AsyncStorage.setItem("fanLevel", fanLevelValue.toString());
-        const pushDocument = {
-          value: String(fanLevelValue),
-          feed: "fan-level",
-        };
-        console.log("pushDocument: ", pushDocument);
-        await postData(pushDocument);
+    const fetchAutoData = async () => {
+      try {
+        const response = await postAuto({ feed: `${isActive ? "ON" : "OFF"}` });
+        console.log("fan level data", response);
+        const fanLevelValue = parseInt(response.prediction, 10);
+        if (fanLevel !== fanLevelValue) {
+          // setFanLevelAPI(parseInt(response.prediction, 10));
+          setFanLevel(fanLevelValue);
+          await AsyncStorage.setItem("fanLevel", fanLevelValue.toString());
+          const pushDocument = {
+            value: String(fanLevelValue),
+            feed: "fan-level",
+          };
+          console.log("pushDocument: ", pushDocument);
+          await postData(pushDocument);
+        }
+      } catch (error) {
+        console.error("Lỗi khi gọi API:", error);
       }
-    } catch (error) {
-      console.error("Lỗi khi gọi API:", error);
+    };
+    if (isActive) {
+      console.log("data: ", data);
+      const interval = setInterval(() => {
+        fetchAutoData();
+      }, 10000); // Gọi API mỗi 10 giây
+      return () => clearInterval(interval); // Dọn dẹp interval khi component unmount
     }
-  };
-  if (isActive){
-    console.log("data: ", data);
-    const interval = setInterval(() => {
-
-      fetchAutoData();
-    }, 10000); // Gọi API mỗi 10 giây
-    return () => clearInterval(interval); // Dọn dẹp interval khi component unmount
-  }
-
-}, [isActive]); // Chỉ gọi khi isActive thay đổi
-
+  }, [isActive]); // Chỉ gọi khi isActive thay đổi
 
   useEffect(() => {
     const handleAppStateChange = async (nextAppState: AppStateStatus) => {
@@ -101,7 +97,6 @@ export default function Thermostat() {
     const newState = !isActive;
     setIsActive(newState);
     await AsyncStorage.setItem("isActive", newState.toString());
-    
   };
 
   const handleFanLevelChange = async (value: number) => {
@@ -130,7 +125,7 @@ export default function Thermostat() {
           <Slider
             value={fanLevel}
             onValueChange={(value) => setFanLevel(Math.round(value[0]))} // Cập nhật UI ngay khi trượt
-            onSlidingComplete={(value) => handleFanLevelChange(value[0])} // Gửi API khi thả ra            
+            onSlidingComplete={(value) => handleFanLevelChange(value[0])} // Gửi API khi thả ra
             minimumValue={0}
             maximumValue={100}
             step={1}

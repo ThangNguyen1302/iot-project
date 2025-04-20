@@ -23,7 +23,8 @@ export default function FanLayout() {
       <Text className={`${activeTab === tab ? "text-black" : "text-gray-500"}`}>
         {tab}
       </Text>
-    </TouchableOpacity>)
+    </TouchableOpacity>
+  );
 
   useEffect(() => {
     // Gọi API mỗi 5 giây
