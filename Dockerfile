@@ -29,7 +29,7 @@ WORKDIR /root/
 # Copy the binary from builder stage
 COPY --from=builder /app/main .
 # Copy config files
-COPY ./fan_speed_data_large.txt ./
+COPY ./fanTrain.txt ./
 COPY ./app.* ./  
 
 # Expose the port

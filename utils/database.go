@@ -37,7 +37,7 @@ type Auto struct {
 }
 func processAndStoreFanTrainData() {
 	// Mở file fanTrain.txt
-	file, err := os.Open("fan_speed_data_large.txt")
+	file, err := os.Open("fanTrain.txt")
 	if err != nil {
 		log.Fatal("Error opening file:", err)
 	}
