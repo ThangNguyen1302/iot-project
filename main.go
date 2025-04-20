@@ -26,7 +26,7 @@ func main() {
 
 	// Tạo goroutine chạy mỗi 5 giây để lấy dữ liệu
 	go func() {
-		ticker := time.NewTicker(5 * time.Second)
+		ticker := time.NewTicker(10 * time.Second)
 		defer ticker.Stop()
 
 		for {

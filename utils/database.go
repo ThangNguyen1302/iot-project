@@ -49,7 +49,7 @@ func processAndStoreFanTrainData() {
 	// Kết nối đến MongoDB
 	db := mongoClient.Database("iot_data")
 	trainDataFanCollection := db.Collection("train-data-fan")
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	
 
@@ -86,7 +86,7 @@ func processAndStoreFanTrainData() {
 		}
 
 		// Tạo context cho MongoDB
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
 		// Lưu document vào collection train-data-fan
@@ -105,18 +105,44 @@ func processAndStoreFanTrainData() {
 }
 func ConnectToMongoDB() {
 	var err error
-	mongoClient, err = mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
-	if err != nil {
-		log.Fatal("Error creating MongoDB client:", err)
-	}
+    mongoURI := os.Getenv("MONGO_URI")
+    if mongoURI == "" {
+        // When running in Docker, use the service name as hostname
+        if os.Getenv("IN_DOCKER") == "true" {
+            mongoURI = "mongodb://mongo:27017"
+        } else {
+            // For local development
+            mongoURI = "mongodb://localhost:27017"
+        }
+    }
+    
+    print("Connecting to MongoDB at ", mongoURI, "...\n")
+    mongoClient, err = mongo.NewClient(options.Client().ApplyURI(mongoURI))
+    if err != nil {
+        log.Fatal("Error creating MongoDB client:", err)
+    }
+		// Add debug information here
+	fmt.Println("MongoDB client created successfully")
+	fmt.Printf("MongoDB URI: %s\n", mongoURI)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	// Now connect to the MongoDB server
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	err = mongoClient.Connect(ctx)
 	if err != nil {
-		log.Fatal("Error connecting to MongoDB:", err)
+		log.Fatal("Error connecting to MongoDB server:", err)
 	}
+
+	// Ping the MongoDB server to verify connection
+	err = mongoClient.Ping(ctx, nil)
+	if err != nil {
+		log.Fatal("Error pinging MongoDB server:", err)
+	}
+
+	fmt.Println("Successfully connected and pinged MongoDB server!")
+
+    // Rest of your connection code
 	processAndStoreFanTrainData()
 	// Tạo các collection tương ứng với danh sách feed keys
 	fmt.Println("Connected to MongoDB!")
@@ -159,7 +185,7 @@ func FetchAndStoreData(config Config) {
 			}
 			// Lưu dữ liệu vào MongoDB
 			collection := db.Collection(feedKey) // Chọn collection dựa trên feedKey
-			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 			defer cancel()
 
 			_, err = collection.DeleteMany(ctx, map[string]interface{}{})

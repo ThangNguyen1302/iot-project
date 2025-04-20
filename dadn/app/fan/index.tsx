@@ -42,7 +42,7 @@ export default function Thermostat() {
         setFanLevel(parseInt(savedLevel, 10));
       }
       const saveMode = await AsyncStorage.getItem("isActive");
-      if (saveMode) {
+      if (saveMode && !isNaN(Number(saveMode))) {
         setIsActive(saveMode === "true");
       }
     };
@@ -58,6 +58,7 @@ export default function Thermostat() {
         if (JSON.stringify(response) !== JSON.stringify(data)) {
           setData(response);
         }
+        // await AsyncStorage.removeItem("fanLevel");
         const fanLevel = await AsyncStorage.getItem("fanLevel");
         console.log("fanLevel storage: ", fanLevel);
       } catch (error) {
@@ -69,7 +70,7 @@ export default function Thermostat() {
 
     const interval = setInterval(() => {
       fetchData();
-    }, 5000);
+    }, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -100,7 +101,7 @@ export default function Thermostat() {
     if (isActive) {
       const interval = setInterval(() => {
         fetchData();
-      }, 5000);
+      }, 10000);
       return () => clearInterval(interval);
     }
   }, [isActive]);
@@ -140,15 +141,18 @@ export default function Thermostat() {
 
   const handleFanLevelChange = async (value: number) => {
     const newValue = Math.round(value);
-    setFanLevel(newValue);
-    await AsyncStorage.setItem("fanLevel", newValue.toString());
-
-    const pushDocument = {
-      value: String(value),
-      feed: "fan-level",
-    };
-    console.log("pushDocument: ", pushDocument);
-    await postData(pushDocument);
+    if (!isNaN(newValue)) {
+      setFanLevel(newValue);
+      await AsyncStorage.setItem("fanLevel", newValue.toString());
+      const pushDocument = {
+        value: String(value),
+        feed: "fan-level",
+      };
+      console.log("pushDocument: ", pushDocument);
+      await postData(pushDocument);
+    } else {
+      console.log("Invalid value: ", value);
+    }
   };
 
   return (
