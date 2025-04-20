@@ -61,13 +61,13 @@ The frontend is a React Native Expo application with a Docker setup for producti
 2. Build the Docker image:
 
    ```bash
-   docker build -t iot-frontend .
+   docker build -t iot-frontend:latest -f DockerFile .
    ```
 
 3. Run the frontend container:
 
    ```bash
-   docker run -p 3000:80 -d iot-frontend
+   docker run -d -p 3000:80 --name frontend-container iot-frontend
    ```
 
 4. Access the frontend at `http://localhost:3000`
