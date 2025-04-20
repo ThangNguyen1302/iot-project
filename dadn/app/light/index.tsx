@@ -2,11 +2,23 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { useState } from "react";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { postLight } from "@/services/api";
 
 export default function LightControl() {
   const [isLightOn, setIsLightOn] = useState(false);
 
-  const toggleLight = () => {
+  const toggleLight = async () => {
+    const lightData = {
+      value: isLightOn ? "0" : "1",
+      feed: "relay-sensor",
+    };
+    try {
+      const response = await postLight(lightData);
+      console.log("Light control response:", response);
+    }
+    catch (error) {
+      console.error("Error toggling light:", error);
+    }
     setIsLightOn(!isLightOn);
   };
   const router = useRouter();

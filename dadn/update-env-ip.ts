@@ -4,15 +4,30 @@ import path from 'path';
 
 function getLocalIpAddress(): string {
   const interfaces = os.networkInterfaces();
-  for (const name in interfaces) {
-    const iface = interfaces[name];
-    if (!iface) continue;
-    for (const info of iface) {
-      if (info.family === 'IPv4' && !info.internal) {
-        return info.address;
+  const preferredNames = ['Wi-Fi', 'WLAN', 'Wireless', 'en0', 'wlan0']; // thêm tùy hệ điều hành
+  console.log("network interface:",os.networkInterfaces());
+
+  // Ưu tiên adapter tên có trong danh sách
+  for (const preferred of preferredNames) {
+    const iface = interfaces[preferred];
+    if (iface) {
+      for (const info of iface) {
+        if (info.family === 'IPv4' && !info.internal) {
+          return info.address;
+        }
       }
     }
   }
+
+  // Fallback: lấy cái IPv4 nào đó đầu tiên (như cũ)
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]!) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+
   return '127.0.0.1';
 }
 
