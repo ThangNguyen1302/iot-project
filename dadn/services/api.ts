@@ -51,4 +51,19 @@ export const postAuto = async (data: any) => {
   }
 };
 
+export const postLight = async (data: any) => {
+  try {
+    const response = await axios.post(`${API_URL}/push`, data, {
+      headers: {
+        "Content-Type": "application/json", // Đảm bảo gửi đúng JSON
+      },
+    });
+    console.log("postLight: ",response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi khi gọi API:", error);
+    throw error;
+  }
+}
+
 
