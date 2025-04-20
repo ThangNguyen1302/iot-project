@@ -19,11 +19,6 @@ The backend consists of a Go application and a MongoDB database orchestrated usi
 ### Running the Backend
 
 1. Navigate to the root project directory:
-
-   ```bash
-   cd c:\Users\dell\Desktop\BKnam3ki2\project CNPM\code
-   ```
-
 2. Build and start the services:
 
    ```bash
@@ -60,7 +55,7 @@ The frontend is a React Native Expo application with a Docker setup for producti
 1. Navigate to the frontend directory:
 
    ```bash
-   cd c:\Users\dell\Desktop\BKnam3ki2\project CNPM\code\dadn
+   cd dadn
    ```
 
 2. Build the Docker image:
@@ -110,11 +105,11 @@ For local development without Docker:
 - The frontend Dockerfile creates a production-ready web build served through Nginx
 - Update `update-env-ip.ts` script for automatic IP configuration in development
 
-Create a file named app.env with the following content:
 
+
+This is my group link report 
 ```bash
-USERNAME1=anhcevn
-AIOKEY=aio_zlGc66xi5KSqUbBHPU8HR8mg6wGv
-FEEDKEYGET=bbc-hum,pir-sensor,iot-project
-FEEDKEYPOST=fan-level,relay-sensor
+https://www.overleaf.com/7692353563sdvbhddhcrgn#5ec828
 ```
+
+If you have any hesitation. Do not hestiate to contact me at hung.nguyenkhmt22@hcmut.edu.vn
