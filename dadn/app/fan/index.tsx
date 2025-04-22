@@ -66,7 +66,7 @@ export default function Thermostat() {
           value: isActive ? "1" : "0",
           feed: "automatic-mode",
         }); // Pass the required argument
-        console.log("getData: ", response);
+        console.log("getData automatic mode: ", response);
       } catch (error) {
         console.error("Lỗi khi gọi API:", error);
       }
