@@ -11,7 +11,7 @@ import { useState, useEffect } from "react";
 import { Slider } from "@miblanchard/react-native-slider";
 import { Feather } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { getData, postData, postAuto } from "@/services/api";
+import { getData, postData, postAuto, postAutomaticMode } from "@/services/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -56,6 +56,23 @@ export default function Thermostat() {
         console.error("Lỗi khi gọi API:", error);
       }
     };
+    if (isActive) {
+      fetchAutoData();
+    }
+
+    const updateAutomaticMode = async () => {
+      try {
+        const response = await postAutomaticMode({
+          value: isActive ? "1" : "0",
+          feed: "automatic-mode",
+        }); // Pass the required argument
+        console.log("getData: ", response);
+      } catch (error) {
+        console.error("Lỗi khi gọi API:", error);
+      }
+    };
+    updateAutomaticMode(); // Call the async function
+
     if (isActive) {
       console.log("data: ", data);
       const interval = setInterval(() => {
